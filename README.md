@@ -34,11 +34,11 @@ Los lectores de archivos, las validaciones y la persistencia tendrán responsabi
 
 ## Estado actual
 
-El repositorio contiene la configuración inicial de Git y esta documentación. **Todavía no hay una solución .NET, una aplicación ejecutable ni una carga de datos implementada aquí.**
+El proyecto contiene la configuración inicial de Git y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts se comprobaron localmente sobre SQL Server con registros temporales que se revirtieron.
 
-Existe un modelo previo de la asignatura fuera de este repositorio. Se revisará su correspondencia con los CSV antes de adaptar el esquema o implementar la carga.
+**Todavía no hay una solución .NET, una aplicación ejecutable ni una carga CSV realizada.** El esquema adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
 
-La versión de .NET y las instrucciones de instalación, conexión y ejecución se documentarán cuando se haya definido y comprobado la aplicación.
+La aplicación se desarrollará en .NET 10 LTS, permitido por el mandato vigente. Las instrucciones de ejecución de la aplicación se añadirán cuando exista y haya sido comprobada; las de SQL ya están en la documentación de la base de datos.
 
 ## Flujo de trabajo con Git
 
@@ -54,10 +54,10 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Acordar cómo corresponden los identificadores de los CSV con el modelo relacional.
-2. Definir el tratamiento de referencias inexistentes, campos opcionales, duplicados y ejecuciones repetidas.
-3. Precisar el esquema transaccional, los procedimientos y las vistas necesarios para esta entrega.
-4. Crear la solución de cuatro capas e implementar la carga por etapas.
-5. Comprobar los resultados y preparar las consultas SQL y evidencias.
+1. Crear la solución de cuatro capas en .NET 10.
+2. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
+3. Conectar la carga con los procedimientos y su transacción.
+4. Ejecutar los CSV y comprobar conteos, segunda ejecución y manejo de fallos.
+5. Preparar las evidencias reales de ejecución y tablas pobladas.
 
 El proyecto completo contempla otras fuentes de datos, análisis de opiniones, ejecución mediante Worker Service y visualizaciones. Su implementación se definirá en etapas posteriores.
