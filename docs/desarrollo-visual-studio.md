@@ -4,7 +4,7 @@
 
 La solución usa .NET 10 y está preparada para Visual Studio 2026, versión 18.0 o posterior, con las herramientas de desarrollo de .NET instaladas. Microsoft documenta que el destino net10.0 requiere esa versión del IDE: [compatibilidad de SDK, MSBuild y Visual Studio](https://learn.microsoft.com/en-us/dotnet/core/porting/versioning-sdk-msbuild-vs).
 
-En el diagnóstico del 2026-10-23 se encontró Visual Studio Community 2022 17.14.37 y el SDK independiente 10.0.303. Este SDK permitió compilar por terminal, pero no convierte Visual Studio 2022 en un entorno compatible para desarrollar y depurar net10.0. La apertura y depuración en Visual Studio 2026 todavía no se han comprobado en este equipo.
+El 2026-10-23 se confirmó Visual Studio Community 2026 estable 18.11.1 instalado. La evidencia de ejecución desde el IDE muestra cuatro proyectos compilados, cero fallos, los dos mensajes iniciales y salida del proceso 0. No se ha comprobado todavía depuración con puntos de interrupción.
 
 Para preparar el IDE, instalar Visual Studio 2026 desde la [página oficial](https://visualstudio.microsoft.com/downloads/) y seleccionar las herramientas para desarrollo de escritorio de .NET. No hace falta instalar herramientas web, Azure o contenedores para esta consola. Conservar las instalaciones existentes si otras asignaturas las necesitan.
 
@@ -12,7 +12,7 @@ Para preparar el IDE, instalar Visual Studio 2026 desde la [página oficial](htt
 
 ## Abrir y ejecutar
 
-1. Abrir Visual Studio 2026 y seleccionar **Abrir un proyecto o una solución**.
+1. Abrir Visual Studio 2026 explícitamente desde Inicio; si también está instalado Visual Studio 2022, el doble clic en el sln puede abrir la versión anterior. Seleccionar **Abrir un proyecto o una solución**.
 2. Seleccionar [SistemaAnalisisOpiniones.sln](../SistemaAnalisisOpiniones.sln) en la raíz del repositorio.
 3. Verificar que el Explorador de soluciones muestre ETL.Entities, ETL.DAL, ETL.BLL y ETL.Consola dentro de src.
 4. Establecer **ETL.Consola como proyecto de inicio** desde su menú contextual.

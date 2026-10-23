@@ -38,7 +38,7 @@ El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sl
 
 **La consola ejecuta únicamente el mensaje inicial de la estructura; todavía no realiza una carga CSV.** La solución compila con cero advertencias y cero errores por terminal. El esquema SQL adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
 
-El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; en este equipo se detectó Visual Studio 2022, por lo que la comprobación de apertura y depuración en el IDE sigue pendiente. Consulta las [instrucciones de Visual Studio y ejecución](docs/desarrollo-visual-studio.md).
+El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0. Consulta las [instrucciones de Visual Studio y ejecución](docs/desarrollo-visual-studio.md).
 
 ## Flujo de trabajo con Git
 
@@ -54,7 +54,7 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Preparar Visual Studio 2026 para abrir y depurar la solución .NET 10.
+1. Mantener Visual Studio 2026 y el SDK .NET 10 preparados para el desarrollo.
 2. Crear entidades y contratos de la carga.
 3. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
 4. Conectar la carga con los procedimientos y su transacción.
