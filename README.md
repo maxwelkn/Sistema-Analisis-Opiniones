@@ -38,7 +38,7 @@ El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sl
 
 **La consola ejecuta únicamente el mensaje inicial de la estructura; todavía no realiza una carga CSV.** La solución compila con cero advertencias y cero errores por terminal. El esquema SQL adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
 
-El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0. Consulta las [instrucciones de Visual Studio y ejecución](docs/desarrollo-visual-studio.md).
+El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0.
 
 ## Flujo de trabajo con Git
 
