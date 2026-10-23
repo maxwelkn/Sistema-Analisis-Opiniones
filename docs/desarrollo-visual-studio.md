@@ -32,9 +32,9 @@ La salida actual identifica la estructura inicial y avisa que la carga CSV se im
 | ETL.BLL | Lectores aislados, validaciones y coordinación de la carga | ETL.Entities |
 | ETL.Consola | Configuración, composición y presentación del proceso | ETL.Entities, ETL.BLL y ETL.DAL |
 
-Las tres bibliotecas están inicialmente sin clases de negocio. Se retiraron las clases vacías Class1 de las plantillas porque no representan ninguna responsabilidad del proyecto. Se añadirán entidades y contratos cuando se implemente la carga.
+ETL.Entities contiene los modelos, resultados de persistencia y contratos de sesión transaccional descritos en [entidades y contratos de carga](entidades-contratos-carga.md). BLL y DAL todavía no tienen implementaciones. Se retiraron las clases vacías Class1 de las plantillas porque no representan ninguna responsabilidad del proyecto.
 
-BLL no referencia DAL: la coordinación consumirá contratos puros y la consola conectará las implementaciones. Estas referencias preparan la separación de responsabilidades; todavía no hay interfaces ni inyección de dependencias implementadas.
+BLL no referencia DAL: la coordinación consumirá contratos puros y la consola conectará las implementaciones. Estas referencias preparan la separación de responsabilidades; existen las interfaces de persistencia, pero todavía no hay implementaciones ni composición de dependencias.
 
 ## Verificación por terminal
 
@@ -52,4 +52,4 @@ Los directorios bin y obj y la configuración personal de Visual Studio están e
 
 ## Siguiente implementación
 
-Crear entidades de entrada y resultados, definir contratos necesarios, implementar lectura CSV y validaciones, conectar los procedimientos SQL y ejecutar la carga. Las herramientas y paquetes externos se incorporarán cuando se utilicen, con versiones compatibles y verificación correspondiente.
+Implementar lectura CSV y validaciones sobre los modelos, implementar los contratos de persistencia, conectar los procedimientos SQL y ejecutar la carga. Las herramientas y paquetes externos se incorporarán cuando se utilicen, con versiones compatibles y verificación correspondiente.

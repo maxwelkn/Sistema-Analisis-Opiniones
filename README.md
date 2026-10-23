@@ -36,6 +36,8 @@ Los lectores de archivos, las validaciones y la persistencia tendrán responsabi
 
 El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sln) en .NET 10 y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts SQL se comprobaron con registros temporales que se revirtieron.
 
+ETL.Entities incluye los modelos Cliente, Producto, FuenteDatos y Opinion, el resultado tipado de persistencia y los contratos de sesión transaccional. Su alcance está descrito en [entidades y contratos de carga](docs/entidades-contratos-carga.md); todavía no hay implementaciones de esos contratos.
+
 **La consola ejecuta únicamente el mensaje inicial de la estructura; todavía no realiza una carga CSV.** La solución compila con cero advertencias y cero errores por terminal. El esquema SQL adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
 
 El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0. Consulta las [instrucciones de Visual Studio y ejecución](docs/desarrollo-visual-studio.md).
@@ -54,10 +56,8 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Mantener Visual Studio 2026 y el SDK .NET 10 preparados para el desarrollo.
-2. Crear entidades y contratos de la carga.
-3. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
-4. Conectar la carga con los procedimientos y su transacción.
-5. Ejecutar los CSV y comprobar conteos, segunda ejecución, manejo de fallos y evidencias reales.
+1. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
+2. Implementar los contratos de persistencia con los procedimientos y su transacción.
+3. Ejecutar los CSV y comprobar conteos, segunda ejecución, manejo de fallos y evidencias reales.
 
 El proyecto completo contempla otras fuentes de datos, análisis de opiniones, ejecución mediante Worker Service y visualizaciones. Su implementación se definirá en etapas posteriores.
