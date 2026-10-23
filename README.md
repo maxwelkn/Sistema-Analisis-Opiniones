@@ -34,11 +34,11 @@ Los lectores de archivos, las validaciones y la persistencia tendrán responsabi
 
 ## Estado actual
 
-El proyecto contiene la configuración inicial de Git y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts se comprobaron localmente sobre SQL Server con registros temporales que se revirtieron.
+El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sln) en .NET 10 y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts SQL se comprobaron con registros temporales que se revirtieron.
 
-**Todavía no hay una solución .NET, una aplicación ejecutable ni una carga CSV realizada.** El esquema adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
+**La consola ejecuta únicamente el mensaje inicial de la estructura; todavía no realiza una carga CSV.** La solución compila con cero advertencias y cero errores por terminal. El esquema SQL adapta el modelo previo con identificadores externos, unicidad por origen y clasificación pendiente.
 
-La aplicación se desarrollará en .NET 10 LTS, permitido por el mandato vigente. Las instrucciones de ejecución de la aplicación se añadirán cuando exista y haya sido comprobada; las de SQL ya están en la documentación de la base de datos.
+El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0. Consulta las [instrucciones de Visual Studio y ejecución](docs/desarrollo-visual-studio.md).
 
 ## Flujo de trabajo con Git
 
@@ -54,10 +54,10 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Crear la solución de cuatro capas en .NET 10.
-2. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
-3. Conectar la carga con los procedimientos y su transacción.
-4. Ejecutar los CSV y comprobar conteos, segunda ejecución y manejo de fallos.
-5. Preparar las evidencias reales de ejecución y tablas pobladas.
+1. Mantener Visual Studio 2026 y el SDK .NET 10 preparados para el desarrollo.
+2. Crear entidades y contratos de la carga.
+3. Implementar lectura CSV, correspondencias, validaciones y reporte de rechazos conforme a las reglas acordadas.
+4. Conectar la carga con los procedimientos y su transacción.
+5. Ejecutar los CSV y comprobar conteos, segunda ejecución, manejo de fallos y evidencias reales.
 
 El proyecto completo contempla otras fuentes de datos, análisis de opiniones, ejecución mediante Worker Service y visualizaciones. Su implementación se definirá en etapas posteriores.

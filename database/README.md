@@ -1,6 +1,6 @@
 # Base de datos de la carga transaccional
 
-Base: `AnalisisOpinionesClientes`, SQL Server. Esta etapa adapta el modelo previo; todavía no carga los CSV ni contiene la aplicación .NET.
+Base: `AnalisisOpinionesClientes`, SQL Server. Esta carpeta contiene la adaptación del modelo previo; los scripts no cargan los CSV. La estructura .NET se encuentra en src/, pero todavía no implementa el proceso de carga.
 
 ## Archivos y ejecución
 
