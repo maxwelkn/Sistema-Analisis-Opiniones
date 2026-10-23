@@ -1,0 +1,40 @@
+# Contexto y reglas locales
+/context.md
+/AGENTS.md
+
+# Compilacion e IDE
+**/[Bb]in/
+**/[Oo]bj/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+TestResults/
+*.coverage
+
+# Secretos y configuracion personal
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/secrets.json
+*.pfx
+*.p12
+*.key
+
+# Archivos fisicos y respaldos de SQL Server
+*.mdf
+*.ndf
+*.ldf
+*.bak
+*.trn
+
+# Temporales y resultados locales
+tmp/
+temp/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
