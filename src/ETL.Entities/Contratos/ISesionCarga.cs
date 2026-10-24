@@ -4,6 +4,9 @@ namespace ETL.Entities.Contratos;
 
 public interface ISesionCarga : IAsyncDisposable
 {
+    Task<FuenteDatos?> ObtenerFuenteAsync(
+        string idExterno, CancellationToken cancellationToken = default);
+
     Task<ResultadoPersistencia<int>> CargarClienteAsync(
         Cliente cliente, CancellationToken cancellationToken = default);
 
