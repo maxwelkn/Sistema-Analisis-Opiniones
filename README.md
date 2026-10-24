@@ -40,7 +40,7 @@ ETL.Entities incluye los modelos, resultados y contratos de sesión transacciona
 
 **La consola valida los seis CSV con `--validar` y los carga en SQL Server con `--cargar`.** Comprueba estructura, campos, formatos, duplicados y referencias; genera resumen por archivo y reporte JSON local. La carga confirma el conjunto válido en una transacción y revierte ante errores técnicos previos a la confirmación.
 
-La primera carga real del conjunto académico confirmó 1206 filas CSV y cinco fuentes técnicas adicionales; rechazó 494 filas. La segunda carga confirmó cero inserciones y 1206 omisiones, con los mismos rechazos. La base quedó con 500 clientes, 200 productos, 105 fuentes y 406 opiniones; 400 opiniones web/redes siguen sin clasificación. Se comprobaron las relaciones y la ausencia de duplicados. Las capturas para la entrega y la prueba manual del nuevo comando desde el IDE siguen pendientes.
+La primera carga real del conjunto académico confirmó 1206 filas CSV y cinco fuentes técnicas adicionales; rechazó 494 filas. La segunda carga confirmó cero inserciones y 1206 omisiones, con los mismos rechazos. La base quedó con 500 clientes, 200 productos, 105 fuentes y 406 opiniones; 400 opiniones web/redes siguen sin clasificación. Se comprobaron las relaciones y la ausencia de duplicados. La reejecución con --cargar se comprobó desde Visual Studio, con estado Confirmada y código de salida 2 por los rechazos esperados. Se prepararon capturas reales de ejecución, tablas pobladas y consultas SQL, junto con un informe de entrega; estas evidencias permanecen locales.
 
 El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0.
 
@@ -58,9 +58,8 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Probar los comandos desde Visual Studio y revisar el PR de carga antes de integrarlo.
-2. Preparar capturas reales de ejecución y tablas pobladas para la entrega.
-3. Definir con el material del profesor la siguiente unidad del proyecto.
+1. Presentar el proyecto, los scripts y las evidencias de la carga transaccional según el mandato.
+2. Definir con el material del profesor la siguiente unidad del proyecto.
 
 ## Ejecutar la validación
 
