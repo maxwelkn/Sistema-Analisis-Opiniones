@@ -1,6 +1,6 @@
 # Base de datos de la carga transaccional
 
-Base: `AnalisisOpinionesClientes`, SQL Server. Esta carpeta contiene la adaptación del modelo previo; los scripts no cargan los CSV. La estructura .NET se encuentra en src/, pero todavía no implementa el proceso de carga.
+Base: `AnalisisOpinionesClientes`, SQL Server. Esta carpeta contiene esquema, procedimientos, vistas y verificaciones; los scripts no cargan los CSV. La aplicación .NET en src/ ejecuta la validación y la carga mediante --validar y --cargar.
 
 ## Archivos y ejecución
 
@@ -38,7 +38,7 @@ Opiniones mantiene las FK a clientes, productos y fuentes; cliente es opcional. 
 
 Clasificacion puede ser NULL mientras esté pendiente; cuando tenga valor, debe ser Positiva, Negativa o Neutra. PuntajeSatisfaccion admite NULL o valores de 1 a 5. Los comentarios, nombres, categorías e identificadores obligatorios no admiten texto vacío. No se añaden valores de sustitución a datos inválidos.
 
-Las correspondencias entre códigos de entrada y claves internas se resolverán en la aplicación usando IdExterno. Los catálogos se cargarán antes que las opiniones. La regla académica C/P y el tratamiento de rechazos se ejecutarán en esa etapa; no están implementados por los scripts SQL.
+La aplicación resuelve correspondencias usando IdExterno y las claves internas devueltas por los procedimientos; carga catálogos antes que opiniones. BLL aplica la equivalencia académica C/P y los rechazos; los scripts no intentan deducir esas equivalencias.
 
 ## Contrato de los procedimientos
 
@@ -54,7 +54,7 @@ Un Insertado solo se convierte en dato persistido cuando el llamador confirma la
 
 Los textos se comparan con una collation binaria para distinguir contenido diferente, incluidos cambios de mayúsculas y acentos. La aplicación deberá validar longitudes y normalizar según las reglas acordadas antes de enviar parámetros; la existencia de un procedimiento no sustituye esas validaciones.
 
-`usp_CargarOpinion` comprueba que la fuente tenga el tipo correspondiente al canal: Web → Web, Encuesta → CSV y RedSocial → Red Social. Las FK siguen siendo la garantía de existencia de los catálogos. La asignación de fuentes importadas o técnicas corresponde al proceso de carga futuro.
+`usp_CargarOpinion` comprueba que la fuente tenga el tipo correspondiente al canal: Web → Web, Encuesta → CSV y RedSocial → Red Social. Las FK siguen siendo la garantía de existencia. La aplicación conserva las fuentes F importadas y enlaza opiniones a cinco fuentes técnicas con códigos ETL:canal:origen. DAL consulta sus metadatos con parámetros y bloqueos dentro de la misma transacción para reutilizar la fecha persistida.
 
 `usp_ObtenerConteos` devuelve los totales actuales por tabla; no sustituye las métricas de una ejecución ETL.
 
@@ -64,4 +64,6 @@ Los textos se comparan con una collation binaria para distinguir contenido difer
 - `vw_ResumenCargaPorCanal`: total, clasificadas y pendientes por canal. No presenta clasificación pendiente como Neutra.
 - `vw_CalidadReferencial`: identifica posibles huérfanos por cada relación.
 
-El 2026-10-23 se aplicaron los scripts sobre el modelo anterior vacío y se ejecutaron las pruebas de inserción, duplicados, conflictos, unicidad por canal, cliente opcional, clasificación pendiente, las tres FK, rangos, canal, contrato de transacción y compatibilidad de fuente. Los registros temporales se revirtieron. Las cuatro tablas quedaron vacías; la carga real sigue pendiente.
+El 2026-10-23 se aplicaron los scripts sobre el modelo vacío y se probaron inserción, duplicados, conflictos, unicidad por canal, cliente opcional, clasificación pendiente, FK, rangos, transacción y compatibilidad de fuente con datos temporales revertidos.
+
+Después se ejecutó la carga real desde .NET: 1206 filas CSV insertadas, 494 rechazadas y cinco fuentes técnicas aparte. La reejecución insertó cero y omitió las 1206 filas ya existentes y las cinco técnicas. Resultado comprobado: Clientes 500, Productos 200, FuenteDatos 105 y Opiniones 406 (200 Web, 200 RedSocial, seis Encuesta); 400 pendientes de clasificación. Las nueve consultas de 04_consultas_validacion.sql se ejecutaron; se comprobaron cero huérfanos, cero opiniones duplicadas y las tres FK habilitadas y confiables. Los reportes de resultados permanecen locales; las capturas para la entrega siguen pendientes.
