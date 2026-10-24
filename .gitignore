@@ -43,3 +43,6 @@ Thumbs.db
 
 # Reportes privados de validacion
 **/reportes-locales/
+
+# Entregables
+entregable/
