@@ -36,11 +36,11 @@ Los lectores de archivos, las validaciones y la persistencia tendrán responsabi
 
 El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sln) en .NET 10 y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts SQL se comprobaron con registros temporales que se revirtieron.
 
-ETL.Entities incluye los modelos Cliente, Producto, FuenteDatos y Opinion, el resultado tipado de persistencia y los contratos de sesión transaccional. Todavía no hay implementaciones de esos contratos.
+ETL.Entities incluye los modelos, resultados y contratos de sesión transaccional. DAL los implementa con Microsoft.Data.SqlClient y los procedimientos SQL existentes; BLL coordina catálogos, fuentes técnicas y opiniones sin depender de SqlClient.
 
-**La consola lee y valida los seis CSV mediante `--validar`; todavía no inserta datos en SQL Server.** Comprueba estructura, campos, formatos, duplicados y referencias contra los catálogos CSV. Genera un resumen por archivo y un reporte JSON local de rechazos. La persistencia y sus contratos todavía no tienen implementación .NET.
+**La consola valida los seis CSV con `--validar` y los carga en SQL Server con `--cargar`.** Comprueba estructura, campos, formatos, duplicados y referencias; genera resumen por archivo y reporte JSON local. La carga confirma el conjunto válido en una transacción y revierte ante errores técnicos previos a la confirmación.
 
-La validación local del conjunto académico produjo 1700 filas procesadas, 1206 aptas, 494 rechazadas y cero omitidas. Son resultados de validación, no inserciones. Las pruebas automatizadas usan datos sintéticos y no necesitan SQL Server ni los CSV originales.
+La primera carga real del conjunto académico confirmó 1206 filas CSV y cinco fuentes técnicas adicionales; rechazó 494 filas. La segunda carga confirmó cero inserciones y 1206 omisiones, con los mismos rechazos. La base quedó con 500 clientes, 200 productos, 105 fuentes y 406 opiniones; 400 opiniones web/redes siguen sin clasificación. Se comprobaron las relaciones y la ausencia de duplicados. La reejecución con --cargar se comprobó desde Visual Studio, con estado Confirmada y código de salida 2 por los rechazos esperados. Se prepararon capturas reales de ejecución, tablas pobladas y consultas SQL, junto con un informe de entrega; estas evidencias permanecen locales.
 
 El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0.
 
@@ -58,9 +58,8 @@ Los archivos compilados, la configuración personal, los secretos, los archivos 
 
 ## Próximos pasos
 
-1. Probar el modo de validación desde Visual Studio.
-2. Proponer e implementar los contratos de persistencia con los procedimientos y su transacción.
-3. Ejecutar la carga y comprobar conteos, segunda ejecución, manejo de fallos y evidencias reales.
+1. Presentar el proyecto, los scripts y las evidencias de la carga transaccional según el mandato.
+2. Definir con el material del profesor la siguiente unidad del proyecto.
 
 ## Ejecutar la validación
 
@@ -73,7 +72,7 @@ dotnet run --project src/ETL.Consola/ETL.Consola.csproj -- --validar "ruta-a-la-
 
 La carpeta debe contener clients.csv, products.csv, fuente_datos.csv, web_reviews.csv, surveys_part1.csv y social_comments.csv. Los archivos se proporcionan aparte y no forman parte del repositorio público. Sin argumentos, la consola muestra ayuda.
 
-Los encabezados se comparan por nombre exacto, incluidos acentos, y pueden cambiar de orden. Se exige UTF-8, con o sin BOM. Las fechas usan yyyy-MM-dd y los puntajes enteros 1–5. Se omiten duplicados idénticos dentro de cada archivo y se rechazan conflictos, manteniendo la primera fila válida. La comprobación de duplicados contra SQL Server corresponderá a la persistencia.
+Los encabezados se comparan por nombre exacto, incluidos acentos, y pueden cambiar de orden. Se exige UTF-8, con o sin BOM. Las fechas usan yyyy-MM-dd y los puntajes enteros 1–5. Se omiten duplicados idénticos dentro de cada archivo y se rechazan conflictos, manteniendo la primera fila válida. Durante la carga también se comprueban los duplicados contra SQL Server mediante los procedimientos.
 
 Las referencias C/P se convierten a los identificadores numéricos externos de los catálogos como supuesto académico de este conjunto, conservando los códigos originales. Cliente vacío se admite como opcional; uno informado pero ausente se rechaza. La clasificación web/redes queda pendiente. Una fila con varios motivos cuenta como un solo rechazo.
 
@@ -81,8 +80,8 @@ Los reportes se guardan en reportes-locales/, excluida de Git, y contienen archi
 
 | Código de salida | Significado |
 | --- | --- |
-| 0 | Validación completa sin rechazos, o ayuda |
-| 2 | Validación completa con registros rechazados |
+| 0 | Validación o carga completa sin rechazos, o ayuda |
+| 2 | Validación completa o carga confirmada con registros rechazados |
 | 1 | Argumentos, archivo o reporte impiden completar la operación |
 | 130 | Cancelación solicitada |
 
@@ -92,6 +91,23 @@ Los reportes se guardan en reportes-locales/, excluida de Git, y contienen archi
 dotnet test --solution SistemaAnalisisOpiniones.sln --configuration Release
 ```
 
-El proyecto tests/ETL.Tests usa xUnit y Microsoft.Testing.Platform, seleccionado en global.json para el SDK .NET 10. Es un proyecto de pruebas, no una quinta capa de la aplicación. No hay pipeline ni requisito de cobertura.
+El proyecto tests/ETL.Tests usa xUnit y Microsoft.Testing.Platform, seleccionado en global.json para el SDK .NET 10. Es un proyecto de pruebas, no una quinta capa. Sin configuración SQL, las seis pruebas de integración se omiten explícitamente; las otras 69 usan datos sintéticos y no necesitan los originales. Con ETL_SQL_CONNECTION y una base preparada se ejecutan las 75 pruebas. Las pruebas SQL revierten sus datos temporales; pueden consumir valores de IDENTITY. No hay pipeline ni requisito de cobertura.
+
+## Ejecutar la carga SQL
+
+Preparar primero la base con los [scripts SQL](database/README.md). En la misma terminal donde se ejecutará la aplicación, configurar la conexión autorizada mediante una variable de entorno:
+
+```powershell
+$env:ETL_SQL_CONNECTION = "Server=SERVIDOR;Database=AnalisisOpinionesClientes;Integrated Security=True;Encrypt=True;"
+dotnet run --project src/ETL.Consola/ETL.Consola.csproj -- --cargar "ruta-a-la-carpeta-con-los-seis-csv"
+```
+
+Ajustar el servidor y la configuración del certificado al entorno. No guardar contraseñas ni cadenas privadas en el código, perfiles compartidos, reportes o commits. La variable de una terminal no se transfiere a un Visual Studio que ya estaba abierto; configurarla para el proceso del IDE al probar desde allí.
+
+La aplicación valida primero y no inicia SQL si un archivo tiene un fallo estructural. Carga clientes, productos, las 100 fuentes importadas, cinco fuentes técnicas y opiniones. Las fuentes técnicas representan web_reviews, EncuestaInterna, Instagram, Twitter y Facebook; reutilizan la fecha guardada y se cuentan aparte de las 1700 entradas CSV. Las claves internas devueltas por SQL resuelven las relaciones; no se supone que coincidan con los identificadores externos.
+
+Una clave existente con valores iguales se omite; con valores distintos se rechaza, sin actualizaciones ni borrados automáticos. Las opiniones dependientes de un maestro o fuente técnica en conflicto se rechazan también. El código de salida 2 indica una carga confirmada con rechazos, no un fallo técnico.
+
+El reporte carga-*.json distingue Confirmada, Revertida, NoIniciada e Indeterminada. Solo Confirmada informa inserciones confirmadas; las filas no confirmadas quedan pendientes. Si se pierde la respuesta del COMMIT, el resultado es Indeterminada y requiere reconciliar la base antes de repetir. No se realizan reintentos automáticos. El reporte se abre antes de iniciar SQL para comprobar acceso; si falla su escritura después del COMMIT, se informa el estado de carga conocido sin afirmar que los datos se revirtieron.
 
 El proyecto completo contempla otras fuentes de datos, análisis de opiniones, ejecución mediante Worker Service y visualizaciones. Su implementación se definirá en etapas posteriores.

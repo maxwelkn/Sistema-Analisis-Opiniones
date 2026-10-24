@@ -1,5 +1,5 @@
 # Contexto y reglas locales
-/context.md
+/CONTEXT.md
 /AGENTS.md
 /docs/mapeo-carga-transaccional.md
 /docs/guias-locales/
@@ -43,3 +43,6 @@ Thumbs.db
 
 # Reportes privados de validacion
 **/reportes-locales/
+
+# Entregables
+entregable/
