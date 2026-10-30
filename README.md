@@ -44,6 +44,10 @@ La primera carga real del conjunto académico confirmó 1206 filas CSV y cinco f
 
 El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual Studio 2026 18.0 o posterior; la apertura, compilación y ejecución inicial se comprobaron en Community 2026 estable 18.11.1, con cuatro proyectos compilados y salida 0.
 
+## Modelado analítico
+
+La etapa de modelado también dispone de una [base analítica independiente](database/analitica/README.md): cinco dimensiones y una tabla de hechos, distribuidas en filegroups para dimensiones y hechos. Se comprobaron creación, reejecución e integridad con SQL real y registros de prueba revertidos. Todavía no se han cargado opiniones en esa base; el DER final y el documento de esta actividad siguen pendientes.
+
 ## Flujo de trabajo con Git
 
 - `main` mantiene los cambios integrados y verificados.
