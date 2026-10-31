@@ -113,4 +113,10 @@ El archivo `07` se detiene si hay opiniones o claves/fechas reservadas ocupadas;
 
 Tras las pruebas, las huellas de datos del DW coincidieron con las previas y quedaron cero opiniones. También coincidieron conteos y huellas de datos/objetos de la base transaccional. Las tablas conservan su contrato v1, índices y restricciones verificados. Los resultados de prueba no son resultados del conjunto académico cargado al DW: esa carga sigue pendiente y fuera de esta etapa.
 
-El DER final y el documento de entrega corresponden al siguiente bloque. Este resultado no equivale al cierre completo de la actividad.
+## Entregables de modelado
+
+Se prepararon por separado un DER en PDF horizontal A3, con fuentes editables SVG y Mermaid, y un documento breve de cuatro páginas en DOCX/PDF. El DER se contrastó con los metadatos reales: seis tablas, 33 columnas, cinco relaciones, claves compuestas y distribución en filegroups. El documento explica estructura, normalización, relaciones, almacenamiento, indicadores y las preguntas que necesitan datos adicionales.
+
+Se revisaron las cinco páginas finales mediante imágenes renderizadas. El documento se exportó con Word como alternativa porque el renderizador no encontró LibreOffice. Las copias de los scripts de creación incluidas con los entregables se comprobaron idénticas a los archivos `01` y `02` de esta carpeta. Estos artefactos se entregan aparte del código; no se enlazan archivos locales desde el repositorio.
+
+Los tres tipos de entregables de la actividad están preparados, con las limitaciones de datos ya descritas. Esto no supone que se hayan implementado conectores externos o una carga analítica, ni que se hayan obtenido resultados reales de segmentación o campañas.

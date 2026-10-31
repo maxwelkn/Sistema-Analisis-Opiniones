@@ -46,7 +46,7 @@ El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual
 
 ## Modelado analítico
 
-La etapa de modelado también dispone de una [base analítica independiente](database/analitica/README.md): cinco dimensiones y una tabla de hechos, distribuidas en filegroups para dimensiones y hechos. Incluye nueve vistas y consultas de indicadores por producto, fuente, canal, cliente y periodo. Se comprobaron creación, reejecución, 32 pruebas de integridad y 49 comprobaciones de indicadores con SQL real y datos temporales revertidos. Todavía no se han cargado opiniones en esa base; el DER final y el documento de esta actividad siguen pendientes.
+La etapa de modelado también dispone de una [base analítica independiente](database/analitica/README.md): cinco dimensiones y una tabla de hechos, distribuidas en filegroups para dimensiones y hechos. Incluye nueve vistas y consultas de indicadores por producto, fuente, canal, cliente y periodo. Se comprobaron creación, reejecución, 32 pruebas de integridad y 49 comprobaciones de indicadores con SQL real y datos temporales revertidos. El DER y el documento breve de decisiones se prepararon como entregables separados y se revisaron visualmente. Todavía no se han cargado opiniones en esa base; las limitaciones por datos de segmentación y eventos ausentes siguen documentadas.
 
 ## Flujo de trabajo con Git
 
