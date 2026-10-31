@@ -1,5 +1,7 @@
 # Base de datos de la carga transaccional
 
+El esquema analítico independiente y sus verificaciones se encuentran en [analitica/README.md](analitica/README.md).
+
 Base: `AnalisisOpinionesClientes`, SQL Server. Esta carpeta contiene esquema, procedimientos, vistas y verificaciones; los scripts no cargan los CSV. La aplicación .NET en src/ ejecuta la validación y la carga mediante --validar y --cargar.
 
 ## Archivos y ejecución
