@@ -46,3 +46,6 @@ Thumbs.db
 
 # Entregables
 entregable/
+
+# Archivos de Python de la demo local
+**/__pycache__/

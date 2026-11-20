@@ -1,7 +1,5 @@
-using System.Globalization;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
 using ETL.Entities.Validacion;
 
 namespace ETL.BLL.Lectura;
@@ -11,29 +9,15 @@ internal sealed class LectorCsv
     public DocumentoCsv Leer(
         string ruta, IReadOnlyList<string> columnas, CancellationToken cancellationToken)
     {
-        var configuracion = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            Delimiter = ",",
-            IgnoreBlankLines = false,
-            TrimOptions = TrimOptions.None,
-            ExceptionMessagesContainRawData = false
-        };
-
-        using var lector = new StreamReader(ruta, new UTF8Encoding(false, true), false);
-        if (lector.Peek() == '\uFEFF')
-            lector.Read();
-        using var csv = new CsvReader(lector, configuracion);
+        using var flujo = File.OpenRead(ruta);
+        using var lector = FormatoCsv.AbrirTexto(flujo);
+        using var csv = FormatoCsv.CrearLector(lector);
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!csv.Read())
                 throw new ErrorArchivoCsvException("El archivo no contiene encabezado.");
-            csv.ReadHeader();
-            var encabezados = csv.HeaderRecord ?? [];
-            if (encabezados.Length != columnas.Count ||
-                encabezados.Distinct(StringComparer.Ordinal).Count() != encabezados.Length ||
-                !encabezados.ToHashSet(StringComparer.Ordinal).SetEquals(columnas))
-                throw new ErrorArchivoCsvException("Encabezados faltantes, duplicados o no esperados.");
+            var encabezados = FormatoCsv.LeerEncabezados(csv, columnas);
 
             var filas = new List<FilaCsv>();
             var rechazos = new List<RechazoRegistro>();
@@ -51,8 +35,7 @@ internal sealed class LectorCsv
                     rechazos.Add(new(registro, linea, ["Cantidad de columnas incorrecta."]));
                     continue;
                 }
-                var campos = encabezados.Select((columna, indice) =>
-                    KeyValuePair.Create(columna, valores[indice])).ToDictionary(StringComparer.Ordinal);
+                var campos = FormatoCsv.ObtenerCampos(encabezados, valores, valor => valor);
                 filas.Add(new(registro, linea, campos));
             }
             return new(filas, rechazos);

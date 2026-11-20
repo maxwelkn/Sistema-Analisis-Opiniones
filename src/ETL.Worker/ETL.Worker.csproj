@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../ETL.Entities/ETL.Entities.csproj" />
+    <ProjectReference Include="../ETL.BLL/ETL.BLL.csproj" />
+    <ProjectReference Include="../ETL.DAL/ETL.DAL.csproj" />
+  </ItemGroup>
+</Project>

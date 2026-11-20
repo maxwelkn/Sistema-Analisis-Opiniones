@@ -4,7 +4,11 @@ Proyecto académico de **Electiva I, ITLA**, orientado a integrar y analizar opi
 
 El sistema se desarrollará por etapas durante el cuatrimestre. Cada etapa tendrá un alcance definido, verificaciones y documentación de lo que realmente se haya implementado.
 
-## Entrega actual
+## Actividad 1 · Arquitectura y extracción
+
+El Worker .NET 8 extrae encuestas CSV, reseñas web de SQL Server y comentarios de una API REST. Ejecuta las tres lecturas en paralelo y escribe los resultados en archivos temporales NDJSON. Consulta la [configuración y verificación del Worker](tools/extraccion/README.md).
+
+## Entrega anterior · Carga transaccional
 
 Implementar una aplicación que cargue automáticamente los CSV del proyecto en una base de datos transaccional, respetando las relaciones del modelo.
 
@@ -21,20 +25,21 @@ La entrega incluirá scripts de creación de la base de datos, tablas, restricci
 
 ## Arquitectura acordada
 
-La aplicación se desarrollará en C#/.NET con cuatro capas:
+La aplicación separa contratos, procesamiento, acceso a datos y puntos de entrada:
 
 | Capa | Responsabilidad |
 | --- | --- |
 | **Entities** | Representar las entidades y los resultados del proceso. |
 | **DAL** | Acceder a SQL Server y ejecutar operaciones de persistencia. |
 | **BLL** | Coordinar la carga y aplicar validaciones, transformaciones y reglas de duplicados. |
-| **Consola** | Iniciar el proceso y presentar su resultado. |
+| **Consola** | Ejecutar la validación y carga transaccional. |
+| **Worker** | Extraer datos y publicar los archivos de staging. |
 
-Los lectores de archivos, las validaciones y la persistencia tendrán responsabilidades separadas para facilitar las pruebas y la incorporación de nuevas fuentes. La consola forma parte de las cuatro capas.
+Los lectores de archivos, las validaciones y la persistencia tendrán responsabilidades separadas para facilitar las pruebas y la incorporación de nuevas fuentes. La consola y el Worker son los dos puntos de entrada de la solución.
 
 ## Estado actual
 
-El proyecto contiene una [solución de cuatro capas](SistemaAnalisisOpiniones.sln) en .NET 10 y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts SQL se comprobaron con registros temporales que se revirtieron.
+El proyecto contiene una [solución .NET](SistemaAnalisisOpiniones.sln) con consola en .NET 10 y Worker en .NET 8 y los [scripts de base de datos](database/README.md), con cuatro tablas, procedimientos de carga, vistas y consultas de validación. Los scripts SQL se comprobaron con registros temporales que se revirtieron.
 
 ETL.Entities incluye los modelos, resultados y contratos de sesión transaccional. DAL los implementa con Microsoft.Data.SqlClient y los procedimientos SQL existentes; BLL coordina catálogos, fuentes técnicas y opiniones sin depender de SqlClient.
 
@@ -55,11 +60,6 @@ El entorno de código acordado es Visual Studio. Para net10.0 se requiere Visual
 - Cada PR explica el problema, el cambio y la validación realizada.
 
 Los archivos compilados, la configuración personal, los secretos, los archivos físicos de SQL Server y los temporales quedan excluidos mediante `.gitignore`. Los datos de entrada, documentos de terceros y evidencias se revisarán antes de publicarlos.
-
-## Próximos pasos
-
-1. Presentar el proyecto, los scripts y las evidencias de la carga transaccional según el mandato.
-2. Definir con el material del profesor la siguiente unidad del proyecto.
 
 ## Ejecutar la validación
 
@@ -91,7 +91,7 @@ Los reportes se guardan en reportes-locales/, excluida de Git, y contienen archi
 dotnet test --solution SistemaAnalisisOpiniones.sln --configuration Release
 ```
 
-El proyecto tests/ETL.Tests usa xUnit y Microsoft.Testing.Platform, seleccionado en global.json para el SDK .NET 10. Es un proyecto de pruebas, no una quinta capa. Sin configuración SQL, las seis pruebas de integración se omiten explícitamente; las otras 69 usan datos sintéticos y no necesitan los originales. Con ETL_SQL_CONNECTION y una base preparada se ejecutan las 75 pruebas. Las pruebas SQL revierten sus datos temporales; pueden consumir valores de IDENTITY. No hay pipeline ni requisito de cobertura.
+El proyecto tests/ETL.Tests usa xUnit y Microsoft.Testing.Platform, seleccionado en global.json para el SDK .NET 10. Es un proyecto de pruebas, no una quinta capa. Las seis pruebas de integración de la consola se omiten sin ETL_SQL_CONNECTION. La solución incluye pruebas de extracción y staging con datos sintéticos. La verificación de las tres fuentes con SQL Server se ejecuta por separado según la guía del Worker. Las pruebas SQL revierten sus datos temporales; pueden consumir valores de IDENTITY. No hay pipeline ni requisito de cobertura.
 
 ## Ejecutar la carga SQL
 
@@ -110,4 +110,4 @@ Una clave existente con valores iguales se omite; con valores distintos se recha
 
 El reporte carga-*.json distingue Confirmada, Revertida, NoIniciada e Indeterminada. Solo Confirmada informa inserciones confirmadas; las filas no confirmadas quedan pendientes. Si se pierde la respuesta del COMMIT, el resultado es Indeterminada y requiere reconciliar la base antes de repetir. No se realizan reintentos automáticos. El reporte se abre antes de iniciar SQL para comprobar acceso; si falla su escritura después del COMMIT, se informa el estado de carga conocido sin afirmar que los datos se revirtieron.
 
-El proyecto completo contempla otras fuentes de datos, análisis de opiniones, ejecución mediante Worker Service y visualizaciones. Su implementación se definirá en etapas posteriores.
+Las siguientes etapas incluyen la transformación de las opiniones, la carga al almacén analítico y las visualizaciones.
