@@ -26,19 +26,19 @@ public sealed class ServicioValidacionCsv
         var web = Opiniones("web_reviews.csv", "Web",
             ["IdReview", "IdCliente", "IdProducto", "Fecha", "Comentario", "Rating"]);
         var encuestas = Opiniones("surveys_part1.csv", "Encuesta",
-            ["IdOpinion", "IdCliente", "IdProducto", "Fecha", "Comentario", "Clasificación", "PuntajeSatisfacción", "Fuente"]);
+            ColumnasEncuesta.Valores);
         var redes = Opiniones("social_comments.csv", "RedSocial",
             ["IdComment", "IdCliente", "IdProducto", "Fuente", "Fecha", "Comentario"]);
         return new(clientes, productos, fuentes, web, encuestas, redes);
 
-        ResultadoArchivo<OpinionEntrada> Opiniones(string archivo, string canal, string[] columnas) =>
+        ResultadoArchivo<OpinionEntrada> Opiniones(string archivo, string canal, IReadOnlyList<string> columnas) =>
             ValidarArchivo(directorio, archivo, columnas,
                 fila => validador.Opinion(fila, canal, idsClientes, idsProductos),
                 opinion => opinion.IdExterno, cancellationToken);
     }
 
     private ResultadoArchivo<T> ValidarArchivo<T>(
-        string directorio, string archivo, string[] columnas,
+        string directorio, string archivo, IReadOnlyList<string> columnas,
         Func<IReadOnlyDictionary<string, string>, (T Datos, IReadOnlyList<string> Errores)> convertir,
         Func<T, string> clave, CancellationToken cancellationToken)
     {
