@@ -1,6 +1,6 @@
-# Base analítica: creación y verificación
+# Base analítica: modelo y carga de dimensiones
 
-`AnalisisOpinionesDW` es independiente de `AnalisisOpinionesClientes`. Los scripts crean cinco dimensiones y una tabla de hechos. No leen CSV, no copian datos transaccionales y no implementan conectores ni carga analítica.
+`AnalisisOpinionesDW` es independiente de `AnalisisOpinionesClientes`. El modelo contiene cinco dimensiones y una tabla de hechos. La carga de dimensiones toma los datos de la base transaccional.
 
 ## Requisitos y ejecución
 
@@ -25,6 +25,8 @@ Comprobar el código de salida de cada comando antes de continuar; `-b` devuelve
 | `05_vistas_analiticas.sql` | Crea o actualiza nueve vistas de indicadores; no modifica tablas ni carga filas. |
 | `06_consultas_indicadores.sql` | Consulta indicadores y rankings, identificados con las preguntas de la actividad. Solo lectura. |
 | `07_pruebas_indicadores.sql` | Comprueba cálculos con datos sintéticos y rollback; requiere una base sin opiniones y claves de prueba libres. |
+| `08_cargar_dimensiones.sql` | Carga de forma transaccional los miembros de las dimensiones y emite un resumen tras confirmar. |
+| `09_verificar_dimensiones.sql` | Concilia los miembros esperados y muestra conteos y muestras de las dimensiones. Solo lectura. |
 
 La creación de la base y sus archivos es independiente de la transacción de tablas. Si falla el segundo archivo, la base puede quedar creada sin tablas: revisar el fallo y repetir los pasos, sin eliminar o recrear automáticamente la base.
 
@@ -68,7 +70,7 @@ Las pruebas se detienen si sus claves o fechas reservadas ya existen, sin borrar
 
 El 30 de octubre de 2026 se comprobaron creación, reejecución y 32 pruebas con SQL real. En una prueba controlada adicional se deshabilitó `CK_DimProducto_Textos`: la reejecución devolvió 51213; se restauró con `WITH CHECK CHECK` y la reejecución volvió a aprobar. Las cinco FK y los CHECK quedaron habilitados y confiables.
 
-Resultado final: cero productos, fechas, fuentes y opiniones; un cliente técnico con clave 0 y cuatro clasificaciones (Pendiente, Positiva, Negativa y Neutra). No son registros de origen ni opiniones cargadas. Los conteos y huellas SHA-256 de datos y objetos transaccionales coincidieron antes y después.
+Al terminar la verificación inicial del modelo se observaron cero productos, fechas, fuentes y opiniones; un cliente técnico con clave 0 y cuatro clasificaciones (Pendiente, Positiva, Negativa y Neutra). No son registros de origen ni opiniones cargadas. Los conteos y huellas SHA-256 de datos y objetos transaccionales coincidieron antes y después.
 
 ## Consultas de indicadores
 
@@ -111,7 +113,7 @@ Se verificaron 49 comprobaciones con SQL real el 30 de octubre de 2026: base vac
 
 El archivo `07` se detiene si hay opiniones o claves/fechas reservadas ocupadas; no limpia datos existentes. Sus inserciones, actualizaciones y borrados actúan sobre el escenario temporal dentro de la transacción, que se revierte por completo. Puede consumir valores de IDENTITY. SQL Server puede emitir el aviso de NULL omitido por una agregación: es esperable al contar y promediar datos opcionales; ANSI_WARNINGS permanece activado.
 
-Tras las pruebas, las huellas de datos del DW coincidieron con las previas y quedaron cero opiniones. También coincidieron conteos y huellas de datos/objetos de la base transaccional. Las tablas conservan su contrato v1, índices y restricciones verificados. Los resultados de prueba no son resultados del conjunto académico cargado al DW: esa carga sigue pendiente y fuera de esta etapa.
+Tras las pruebas, las huellas de datos del DW coincidieron con las previas y quedaron cero opiniones. También coincidieron conteos y huellas de datos/objetos de la base transaccional. Las tablas conservan su contrato v1, índices y restricciones verificados. Estas pruebas del 30 de octubre usaron datos sintéticos y se ejecutaron antes de la carga de dimensiones.
 
 ## Entregables de modelado
 
@@ -119,4 +121,39 @@ Se prepararon por separado un DER en PDF horizontal A3, con fuentes editables SV
 
 Se revisaron las cinco páginas finales mediante imágenes renderizadas. El documento se exportó con Word como alternativa porque el renderizador no encontró LibreOffice. Las copias de los scripts de creación incluidas con los entregables se comprobaron idénticas a los archivos `01` y `02` de esta carpeta. Estos artefactos se entregan aparte del código; no se enlazan archivos locales desde el repositorio.
 
-Los tres tipos de entregables de la actividad están preparados, con las limitaciones de datos ya descritas. Esto no supone que se hayan implementado conectores externos o una carga analítica, ni que se hayan obtenido resultados reales de segmentación o campañas.
+Los tres tipos de entregables de la actividad están preparados, con las limitaciones de datos ya descritas. Los entregables de modelado corresponden al diseño y a su comprobación de octubre. La carga posterior de dimensiones se documenta en la siguiente sección.
+
+## Carga de las dimensiones
+
+La carga toma `AnalisisOpinionesClientes` como fuente y escribe en `AnalisisOpinionesDW`. Ejecutar los scripts `01` y `02` para disponer del modelo y comprobar su contrato. Se requiere lectura de Clientes, Productos, FuenteDatos y Opiniones en el origen, y lectura e inserción en las dimensiones de destino. Usar una sesión dedicada sin transacciones abiertas.
+
+```powershell
+sqlcmd -S 'lpc:.' -E -b -f 65001 -i database/analitica/08_cargar_dimensiones.sql
+sqlcmd -S 'lpc:.' -E -b -f 65001 -i database/analitica/09_verificar_dimensiones.sql
+```
+
+| Dimensión | Regla de carga |
+| --- | --- |
+| DimProducto | Copia código externo, nombre y categoría de Productos. |
+| DimCliente | Copia código externo y nombre de Clientes. Conserva el cliente técnico con clave 0. Los atributos de segmentación sin datos quedan en NULL para clientes nuevos. |
+| DimFecha | Crea una fila por día distinto observado en Opiniones. La clave entera usa AAAAMMDD. Año, trimestre, mes y día son columnas calculadas. |
+| DimFuente | Carga pares únicos de código de fuente y canal utilizados por Opiniones, con el tipo de FuenteDatos. |
+| DimClasificacion | Verifica el catálogo instalado por el esquema. Clave 0 para Pendiente, 1 para Positiva, 2 para Negativa y 3 para Neutra. |
+
+El script 08 toma un bloqueo de aplicación y usa una transacción serializable para ejecutar una sola carga a la vez y mantener estable el conjunto leído. Conserva las filas existentes, omite coincidencias y revierte toda la carga si encuentra atributos de origen distintos para una clave existente o si se produce un error SQL. El resumen se emite después de confirmar la transacción. La carga no actualiza atributos ni borra filas. HechoOpinion y la base fuente se conservan.
+
+El script 09 compara claves y atributos esperados por dimensión, devuelve los conteos y muestra ejemplos sin correos, nombres de clientes ni comentarios. Los totales del DW incluyen cualquier miembro preexistente. La comparación informa como faltantes o diferentes los registros esperados que no están representados y falla si el indicador supera cero.
+
+### Resultados en SQL Server
+
+El 25 de noviembre de 2026 se comprobaron la primera ejecución, la reejecución y la lectura posterior mediante sqlcmd en SQL Server 17.0.1155.3.
+
+| Dimensión | Insertadas en primera ejecución | Reutilizadas en primera ejecución | Total comprobado |
+| --- | ---: | ---: | ---: |
+| DimProducto | 200 | 0 | 200 |
+| DimCliente | 500 | 1 | 501 |
+| DimFecha | 202 | 0 | 202 |
+| DimFuente | 5 | 0 | 5 |
+| DimClasificacion | 0 | 4 | 4 |
+
+La reejecución insertó cero filas. La comparación arrojó cero faltantes o diferencias en las cinco dimensiones y HechoOpinion quedó con cero filas. Una copia local del script con un error inducido después de las inserciones y antes de COMMIT devolvió los conteos iniciales. SQL Server puede consumir valores de IDENTITY incluso si se revierte la transacción. Las cuatro tablas fuente conservaron sus conteos y huellas SHA-256, y el contrato del esquema estrella v1 se verificó después de la carga.
